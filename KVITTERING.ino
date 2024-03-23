@@ -1,3 +1,5 @@
+//https://blog.arduino.cc/2023/05/20/control-a-thermal-printer-with-your-arduino/ video med bold, billeder osv
+
 #include <SoftwareSerial.h>
 SoftwareSerial Thermal(2, 3);  //Soft RX from printer on D2, soft TX out to printer on D3
 

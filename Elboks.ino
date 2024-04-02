@@ -1,9 +1,9 @@
-#define inpin1 1
-#define inpin2 2
-#define inpin3 3
-#define outpin1 4
-#define outpin2 5
-#define outpin3 6
+#define inpin1 3
+#define inpin2 5
+#define inpin3 6
+#define outpin1 9
+#define outpin2 10
+#define outpin3 11
 int wins = 0;
 const int arraylen = 3;
 
@@ -14,7 +14,7 @@ void setup() {
   for (int i = 0; i < arraylen; i++) {
     pinMode(inpins[i], INPUT_PULLUP);
     pinMode(outpins[i], OUTPUT);
-    digitalWrite(outpins[i], HIGH);
+    digitalWrite(outpins[i], LOW);
   }
   Serial.begin(9600);
 }
@@ -22,17 +22,18 @@ void setup() {
 void checkConnections() {
   wins = 0;
   for (int i = 0; i < arraylen; i++) {
+    digitalWrite(outpins[i], LOW);
+    Serial.println("Pin #" + String(i+1) + ":" + String(!digitalRead(inpins[i])));
     if (digitalRead(inpins[i]) == LOW) {
-      digitalWrite(outpins[i], LOW);
       wins++;
-    } else {
-      digitalWrite(outpins[i], HIGH); 
     }
+      digitalWrite(outpins[i], HIGH); 
   }
 
   if (wins == arraylen) {
     Serial.println("WUHUUU ALL PINS ARE CONNECTED");
   }
+  Serial.println();
 }
 
 void loop() {

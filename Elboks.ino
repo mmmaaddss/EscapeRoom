@@ -14,7 +14,7 @@ void setup() {
   for (int i = 0; i < arraylen; i++) {
     pinMode(inpins[i], INPUT_PULLUP);
     pinMode(outpins[i], OUTPUT);
-    digitalWrite(outpins[i], LOW);
+    digitalWrite(outpins[i], HIGH);
   }
   Serial.begin(9600);
 }

@@ -26,18 +26,28 @@ void setup() {
 
   for (int baseArray = 0; baseArray < 32; baseArray++) {
     for (int secondaryArray = 0; secondaryArray < 20; secondaryArray++) {
-      randomNumre[baseArray][secondaryArray] = char(random(1, 9));
+      randomNumre[baseArray][secondaryArray] = char(random(0, 0));
     }
   }
-    randomNumre[6][2] = tlf[0]-48;
-    randomNumre[11][3] = tlf[1]-48;
-    randomNumre[8][6] = tlf[2]-48;
-    randomNumre[28][9] = tlf[3]-48;
+    randomNumre[1][1] = tlf[0]-48;
+    randomNumre[1][2] = tlf[1]-48;
+    randomNumre[1][3] = tlf[2]-48;
+    randomNumre[1][4] = tlf[3]-48;
 
-    randomNumre[18][19] = tlf[4]-48;
-    randomNumre[6][13] = tlf[5]-48;
-    randomNumre[12][16] = tlf[6]-48;
-    randomNumre[28][19] = tlf[7]-48;
+    randomNumre[1][5] = tlf[4]-48;
+    randomNumre[1][6] = tlf[5]-48;
+    randomNumre[1][7] = tlf[6]-48;
+    randomNumre[1][8] = tlf[7]-48;
+
+//    randomNumre[2][6] = tlf[0]-48;
+//    randomNumre[3][11] = tlf[1]-48;
+//    randomNumre[6][8] = tlf[2]-48;
+//    randomNumre[8][28] = tlf[3]-48;
+//
+//    randomNumre[10][18] = tlf[4]-48;
+//    randomNumre[13][6] = tlf[5]-48;
+//    randomNumre[16][12] = tlf[6]-48;
+//    randomNumre[19][28] = tlf[7]-48;
 
   Serial.begin(9600);    //Use hardware serial
   Thermal.begin(19200);  //Setup soft serial for ThermalPrinter control

@@ -1,7 +1,10 @@
 //https://blog.arduino.cc/2023/05/20/control-a-thermal-printer-with-your-arduino/ video med bold, billeder osv
 
 #include <SoftwareSerial.h>
+#include "Adafruit_Thermal.h"
+#include "logo.h"
 SoftwareSerial Thermal(2, 3);  //Soft RX from printer on D2, soft TX out to printer on D3
+Adafruit_Thermal printer(&Thermal); // Use the same SoftwareSerial for the Adafruit_Thermal object
 
 #define FALSE 0
 #define TRUE 1
@@ -16,15 +19,29 @@ char printBreakTime = 15;  //Not sure what the defaut is. Testing shows the max 
 String birthday = "25-05-2004";
 String tidspunkt = "13:56"; 
 String tlf = "93996237";
-String backuptlf = "12345678";
-
-
+unsigned char randomNumre[32][20];
 
 void setup() {
   pinMode(ledPin, OUTPUT);
 
+  for (int baseArray = 0; baseArray < 32; baseArray++) {
+    for (int secondaryArray = 0; secondaryArray < 20; secondaryArray++) {
+      randomNumre[baseArray][secondaryArray] = char(random(1, 9));
+    }
+  }
+    randomNumre[6][2] = tlf[0]-48;
+    randomNumre[11][3] = tlf[1]-48;
+    randomNumre[8][6] = tlf[2]-48;
+    randomNumre[28][9] = tlf[3]-48;
+
+    randomNumre[18][19] = tlf[4]-48;
+    randomNumre[6][13] = tlf[5]-48;
+    randomNumre[12][16] = tlf[6]-48;
+    randomNumre[28][19] = tlf[7]-48;
+
   Serial.begin(9600);    //Use hardware serial
   Thermal.begin(19200);  //Setup soft serial for ThermalPrinter control
+  printer.begin(); // Initialize the Adafruit_Thermal printer
 
   printOnBlack = FALSE;
   printUpSideDown = FALSE;
@@ -41,24 +58,25 @@ void setup() {
   Thermal.write(35);
   int printSetting = (printDensity << 4) | printBreakTime;
   Thermal.write(printSetting);  //Combination of printDensity and printBreakTime
+  Serial.println("Ready!");
 }
 
 void loop() {
-  if (Serial.available() > 0) {
+  while (!Serial.available());
+
     char receivedChar = Serial.read();
+    Serial.print("Got: "); Serial.println(receivedChar);
     if (receivedChar == '1') {
       kvittering1();
     }
     else if (receivedChar == '2') {
       kvittering2();
     }
-  }
 }
 
 void kvittering1() { //Kidnapnings kvittering
   Serial.println("Kvittering 1, printer nu!"); //Printer serial besked
-
-  Thermal.println("            Rema420"); //Kvittering
+  printer.printBitmap(logo_width, logo_height, logo_data); // Printer logo
   Thermal.println("");
   Thermal.println("");
   Thermal.println("             Aarhus");
@@ -88,39 +106,22 @@ void kvittering1() { //Kidnapnings kvittering
 }
 
 void kvittering2() { //Random tal kvittering
-  int randomNumre[32][20];
   Serial.println("Kvittering 2, printer nu!"); //Printer serial besked
-  for (int baseArray = 0; baseArray < 32; baseArray++) {
-    for (int secondaryArray = 0; secondaryArray < 20; secondaryArray++) {
-      randomNumre[baseArray][secondaryArray] = random(1, 9);
-    }
-  }
+  
   if (tlf.length() == 8) {
     Serial.println("[ThumbsUp] :)");
-    randomNumre[6][2] = tlf[0];
-    randomNumre[11][3] = tlf[1];
-    randomNumre[8][6] = tlf[2];
-    randomNumre[28][9] = tlf[3];
 
-    randomNumre[18][19] = tlf[4];
-    randomNumre[6][13] = tlf[5];
-    randomNumre[12][16] = tlf[6];
-    randomNumre[28][19] = tlf[7];
   }
   else {
     Serial.println("MEGA [ThumbsDown] :(");
-    randomNumre[6][2] = tlf[0];
-    randomNumre[11][3] = tlf[1];
-    randomNumre[8][6] = tlf[2];
-    randomNumre[28][9] = tlf[3];
-
-    randomNumre[18][19] = tlf[4];
-    randomNumre[6][13] = tlf[5];
-    randomNumre[12][16] = tlf[6];
-    randomNumre[28][19] = tlf[7];
+   
   }
-  for (int i = 0; i < 20; i++) {
-    //her skal der therman printes 32 tegn for hver linje i arrary, (x aksen)
+  for (int i = 0; i<20; i++) {
+    Thermal.println();
+    for (int o = 0; o<32; o++) {
+      Thermal.print(randomNumre[i][o],10);
+//Serial.print('.');
+    }
   }
   Thermal.write(10);  //feeder lidt kvittering
   Thermal.write(10);

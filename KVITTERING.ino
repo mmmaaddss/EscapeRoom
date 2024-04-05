@@ -4,7 +4,7 @@
 #include "Adafruit_Thermal.h"
 #include "logo.h"
 SoftwareSerial Thermal(2, 3);  //Soft RX from printer on D2, soft TX out to printer on D3
-Adafruit_Thermal printer(&Thermal); // Use the same SoftwareSerial for the Adafruit_Thermal object
+//Adafruit_Thermal printer(&Thermal); // Use the same SoftwareSerial for the Adafruit_Thermal object
 
 #define FALSE 0
 #define TRUE 1
@@ -18,17 +18,32 @@ char printDensity = 15;    //Not sure what the defaut is. Testing shows the max 
 char printBreakTime = 15;  //Not sure what the defaut is. Testing shows the max helps darken text. From page 23.
 String birthday = "25-05-2004";
 String tidspunkt = "13:56"; 
-String tlf = "93996237";
-unsigned char randomNumre[32][20];
+String tlf = "XXXXXXXX";
+
+const unsigned int rows = 20;
+const unsigned int columns = 32;
+
+unsigned char randomNumre[rows][columns];
 
 void setup() {
+  Serial.begin(9600);    //Use hardware serial
+  Serial.println("ON");
   pinMode(ledPin, OUTPUT);
 
-  for (int baseArray = 0; baseArray < 32; baseArray++) {
-    for (int secondaryArray = 0; secondaryArray < 20; secondaryArray++) {
-      randomNumre[baseArray][secondaryArray] = char(random(0, 0));
+  for (int baseArray = 0; baseArray < rows; baseArray++) {
+    // Serial.print("Row ");
+    // Serial.print(baseArray+1);
+    //       Serial.print(": ");
+
+
+    for (int secondaryArray = 0; secondaryArray < columns; secondaryArray++) {
+      // Serial.print(secondaryArray+1);
+      // Serial.print(" ");
+      randomNumre[baseArray][secondaryArray] = char(random(0, 10));
     }
+    Serial.println();
   }
+  /*Serial.println("Did random numbers");
     randomNumre[1][1] = tlf[0]-48;
     randomNumre[1][2] = tlf[1]-48;
     randomNumre[1][3] = tlf[2]-48;
@@ -38,20 +53,20 @@ void setup() {
     randomNumre[1][6] = tlf[5]-48;
     randomNumre[1][7] = tlf[6]-48;
     randomNumre[1][8] = tlf[7]-48;
+  Serial.println("Injected phone number into array");*/
 
-//    randomNumre[2][6] = tlf[0]-48;
-//    randomNumre[3][11] = tlf[1]-48;
-//    randomNumre[6][8] = tlf[2]-48;
-//    randomNumre[8][28] = tlf[3]-48;
-//
-//    randomNumre[10][18] = tlf[4]-48;
-//    randomNumre[13][6] = tlf[5]-48;
-//    randomNumre[16][12] = tlf[6]-48;
-//    randomNumre[19][28] = tlf[7]-48;
+   randomNumre[2][6] = tlf[0]-48;
+   randomNumre[3][11] = tlf[1]-48;
+   randomNumre[6][8] = tlf[2]-48;
+   randomNumre[8][28] = tlf[3]-48;
 
-  Serial.begin(9600);    //Use hardware serial
+   randomNumre[10][18] = tlf[4]-48;
+   randomNumre[13][6] = tlf[5]-48;
+   randomNumre[16][12] = tlf[6]-48;
+   randomNumre[19][28] = tlf[7]-48;
+
   Thermal.begin(19200);  //Setup soft serial for ThermalPrinter control
-  printer.begin(); // Initialize the Adafruit_Thermal printer
+  //printer.begin(); // Initialize the Adafruit_Thermal printer
 
   printOnBlack = FALSE;
   printUpSideDown = FALSE;
@@ -86,7 +101,7 @@ void loop() {
 
 void kvittering1() { //Kidnapnings kvittering
   Serial.println("Kvittering 1, printer nu!"); //Printer serial besked
-  printer.printBitmap(logo_width, logo_height, logo_data); // Printer logo
+  //printer.printBitmap(logo_width, logo_height, logo_data); // Printer logo
   Thermal.println("");
   Thermal.println("");
   Thermal.println("             Aarhus");
@@ -126,9 +141,9 @@ void kvittering2() { //Random tal kvittering
     Serial.println("MEGA [ThumbsDown] :(");
    
   }
-  for (int i = 0; i<20; i++) {
+  for (int i = 0; i<rows; i++) {
     Thermal.println();
-    for (int o = 0; o<32; o++) {
+    for (int o = 0; o<columns; o++) {
       Thermal.print(randomNumre[i][o],10);
 //Serial.print('.');
     }

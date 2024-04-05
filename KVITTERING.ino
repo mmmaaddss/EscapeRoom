@@ -1,15 +1,15 @@
-//https://blog.arduino.cc/2023/05/20/control-a-thermal-printer-with-your-arduino/ video med bold, billeder osv
-
-#include <SoftwareSerial.h>
 #include "Adafruit_Thermal.h"
-#include "logo.h"
-SoftwareSerial Thermal(2, 3);  //Soft RX from printer on D2, soft TX out to printer on D3
-//Adafruit_Thermal printer(&Thermal); // Use the same SoftwareSerial for the Adafruit_Thermal object
+#include "adalogo.h"
+#include "adaqrcode.h"
+// Here's the new syntax when using SoftwareSerial (e.g. Arduino Uno) ----
+// If using hardware serial instead, comment out or remove these lines:
 
-#define FALSE 0
-#define TRUE 1
-int printOnBlack = FALSE;
-int printUpSideDown = FALSE;
+#include "SoftwareSerial.h"
+#define TX_PIN 3 // Arduino transmit  YELLOW WIRE  labeled RX on printer
+#define RX_PIN 2 // Arduino receive   GREEN WIRE   labeled TX on printer
+
+SoftwareSerial mySerial(RX_PIN, TX_PIN); // Declare SoftwareSerial obj first
+Adafruit_Thermal Thermal(&mySerial);     // Pass addr to printer constructor
 
 int ledPin = 13;
 int heatTime = 255;        //80 is default from page 23 of datasheet. Controls speed of printing and darkness
@@ -18,72 +18,47 @@ char printDensity = 15;    //Not sure what the defaut is. Testing shows the max 
 char printBreakTime = 15;  //Not sure what the defaut is. Testing shows the max helps darken text. From page 23.
 String birthday = "25-05-2004";
 String tidspunkt = "13:56"; 
-String tlf = "XXXXXXXX";
+String tlf = "11111111";
 
-const unsigned int rows = 20;
-const unsigned int columns = 32;
-
+const unsigned int rows = 14;
+const unsigned int columns = 16;
 unsigned char randomNumre[rows][columns];
 
 void setup() {
-  Serial.begin(9600);    //Use hardware serial
-  Serial.println("ON");
-  pinMode(ledPin, OUTPUT);
+  // NOTE: SOME PRINTERS NEED 9600 BAUD instead of 19200, check test page.
+  mySerial.begin(19200);  // Initialize SoftwareSerial
+  //Serial1.begin(19200); // Use this instead if using hardware serial
+  Thermal.begin();        // Init printer (same regardless of serial type)
+  Serial.begin(9600);
 
   for (int baseArray = 0; baseArray < rows; baseArray++) {
-    // Serial.print("Row ");
-    // Serial.print(baseArray+1);
-    //       Serial.print(": ");
+     Serial.print("Row ");
+     Serial.print(baseArray+1);
+           Serial.print(": ");
 
 
     for (int secondaryArray = 0; secondaryArray < columns; secondaryArray++) {
-      // Serial.print(secondaryArray+1);
-      // Serial.print(" ");
+      Serial.print(secondaryArray+1);
+      Serial.print(" ");
       randomNumre[baseArray][secondaryArray] = char(random(0, 10));
     }
     Serial.println();
   }
-  /*Serial.println("Did random numbers");
-    randomNumre[1][1] = tlf[0]-48;
-    randomNumre[1][2] = tlf[1]-48;
-    randomNumre[1][3] = tlf[2]-48;
-    randomNumre[1][4] = tlf[3]-48;
 
-    randomNumre[1][5] = tlf[4]-48;
-    randomNumre[1][6] = tlf[5]-48;
-    randomNumre[1][7] = tlf[6]-48;
-    randomNumre[1][8] = tlf[7]-48;
-  Serial.println("Injected phone number into array");*/
-
-   randomNumre[2][6] = tlf[0]-48;
-   randomNumre[3][11] = tlf[1]-48;
-   randomNumre[6][8] = tlf[2]-48;
-   randomNumre[8][28] = tlf[3]-48;
-
-   randomNumre[10][18] = tlf[4]-48;
-   randomNumre[13][6] = tlf[5]-48;
-   randomNumre[16][12] = tlf[6]-48;
-   randomNumre[19][28] = tlf[7]-48;
-
-  Thermal.begin(19200);  //Setup soft serial for ThermalPrinter control
-  //printer.begin(); // Initialize the Adafruit_Thermal printer
-
-  printOnBlack = FALSE;
-  printUpSideDown = FALSE;
-
-  //Modify the print speed and heat
-  Thermal.write(27);
-  Thermal.write(55);
-  Thermal.write(7);             //Default 64 dots = 8*('7'+1)
-  Thermal.write(heatTime);      //Default 80 or 800us
-  Thermal.write(heatInterval);  //Default 2 or 20us
-
-  //Modify the print density and timeout
-  Thermal.write(18);
-  Thermal.write(35);
-  int printSetting = (printDensity << 4) | printBreakTime;
-  Thermal.write(printSetting);  //Combination of printDensity and printBreakTime
+int offsetx=4;
+int offsety=3;
+for (int i = 0; i < tlf.length(); i++) {
+    randomNumre[offsety][offsetx+i] = tlf[i]-48;
+}
+    
   Serial.println("Ready!");
+
+//dvehdbe
+
+  Thermal.sleep();      // Tell printer to sleep
+  delay(3000L);         // Sleep for 3 seconds
+  Thermal.wake();       // MUST wake() before printing again, even if reset
+  Thermal.setDefault(); // Restore printer to defaults
 }
 
 void loop() {
@@ -126,12 +101,14 @@ void kvittering1() { //Kidnapnings kvittering
   Thermal.println("");
   Thermal.println("");
   Thermal.println("       "+birthday+" "+tidspunkt);
-  Thermal.write(10);  //feeder lidt kvittering
-  Thermal.write(10);
+  Thermal.println("");
+  Thermal.println("");
 }
 
 void kvittering2() { //Random tal kvittering
+  Thermal.setSize('L');        // Set type size, accepts 'S', 'M', 'L'
   Serial.println("Kvittering 2, printer nu!"); //Printer serial besked
+  
   
   if (tlf.length() == 8) {
     Serial.println("[ThumbsUp] :)");
@@ -141,13 +118,18 @@ void kvittering2() { //Random tal kvittering
     Serial.println("MEGA [ThumbsDown] :(");
    
   }
-  for (int i = 0; i<rows; i++) {
     Thermal.println();
+
+  for (int i = 0; i<rows; i++) {
     for (int o = 0; o<columns; o++) {
       Thermal.print(randomNumre[i][o],10);
+      
 //Serial.print('.');
     }
+    Thermal.println();
+    
   }
-  Thermal.write(10);  //feeder lidt kvittering
-  Thermal.write(10);
+
+  Thermal.println("");
+  Thermal.println("");
 }

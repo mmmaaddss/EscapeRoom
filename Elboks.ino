@@ -1,14 +1,17 @@
-#define inpin1 3
-#define inpin2 5
-#define inpin3 6
-#define outpin1 9
-#define outpin2 10
-#define outpin3 11
-int wins = 0;
-const int arraylen = 3;
+#define inpin1 11
+#define inpin2 10
+#define inpin3 8
+#define inpin4 9
+#define outpin1 2 //sort
+#define outpin2 3 //gul
+#define outpin3 4 //grøn
+#define outpin4 5 //rød
 
-int inpins[arraylen] = {inpin1, inpin2, inpin3};
-int outpins[arraylen] = {outpin1, outpin2, outpin3};
+int wins = 0;
+const int arraylen = 4;
+
+int inpins[arraylen] = {inpin1, inpin2, inpin3, inpin4};
+int outpins[arraylen] = {outpin1, outpin2, outpin3, outpin4};
 
 void setup() {
   for (int i = 0; i < arraylen; i++) {

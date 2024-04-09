@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-TLF_Nummer = "30229734"
+Datainput = "93996237" #tlf nummer, navn eller adresse
 
 url = "https://118.dk/search/go"
 
@@ -17,7 +17,7 @@ querystring = {
     "whereCity": "",
     "category": "",
     "keyword": "",
-    "what": TLF_Nummer,  # Use the constant here
+    "what": Datainput,  # Use the constant here
     "where": ""
 }
 

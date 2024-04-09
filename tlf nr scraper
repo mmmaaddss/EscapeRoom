@@ -1,9 +1,25 @@
 import requests
 from bs4 import BeautifulSoup
 
+TLF_Nummer = "30229734"
+
 url = "https://118.dk/search/go"
 
-querystring = {"pageSize":"25","whatName":"","whatCategory":"","whatPhone":"","whatOther":"","whereStreet":"","whereHouseNumber":"","whereZip":"","whereCity":"","category":"","keyword":"","what":"30229734","where":""}
+querystring = {
+    "pageSize": "25",
+    "whatName": "",
+    "whatCategory": "",
+    "whatPhone": "",
+    "whatOther": "",
+    "whereStreet": "",
+    "whereHouseNumber": "",
+    "whereZip": "",
+    "whereCity": "",
+    "category": "",
+    "keyword": "",
+    "what": TLF_Nummer,  # Use the constant here
+    "where": ""
+}
 
 payload = ""
 headers = {

@@ -31,5 +31,5 @@ def create_news(profilepicturefilename):
                              remove_temp=True)
 
 
-picturefilename = 'IMG_3673.PNG'
+picturefilename = '../scrapere/selected_image.jpg'
 create_news(picturefilename)

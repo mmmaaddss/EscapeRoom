@@ -133,12 +133,12 @@ def display_profile_pictures(name):
 def save_image(img_url, index):
     response = requests.get(img_url)
     if response.status_code == 200:
-        with open(f"selected_image_{index+1}.jpg", 'wb') as f:
+        with open(f"selected_image.jpg", 'wb') as f:
             f.write(response.content)
 
 # Main function to run the program
 def main():
-    data_input = "93996237"  # Example input number
+    data_input = "23938161"  # Example input number
     name, address = get_name_and_address(data_input)
     print(f"Name: {name}")
     print(f"Address: {address}")
